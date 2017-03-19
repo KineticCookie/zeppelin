@@ -17,12 +17,12 @@
 
 package org.apache.zeppelin.interpreter;
 
+import org.apache.zeppelin.interpreter.thrift.InterpreterCompletion;
+import org.apache.zeppelin.scheduler.Scheduler;
+
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
-
-import org.apache.zeppelin.interpreter.thrift.InterpreterCompletion;
-import org.apache.zeppelin.scheduler.Scheduler;
 
 /**
  * Interpreter wrapper for lazy initialization
