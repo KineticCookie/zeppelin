@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>org.apache.zeppelin:zeppelin-interpreter:[0.8.0]</artifactId>
+    <artifactId>zeppelin-ruby</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.apache.zeppelin</groupId>
