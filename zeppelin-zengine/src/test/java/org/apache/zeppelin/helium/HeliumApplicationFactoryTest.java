@@ -92,7 +92,6 @@ public class HeliumApplicationFactoryTest implements JobListenerFactory {
 
     SearchService search = mock(SearchService.class);
     notebookRepo = new VFSNotebookRepo(conf);
-    NotebookAuthorization notebookAuthorization = NotebookAuthorization.init(conf);
     notebook = new Notebook(
         conf,
         notebookRepo,
@@ -100,7 +99,6 @@ public class HeliumApplicationFactoryTest implements JobListenerFactory {
         factory,
         this,
         search,
-        notebookAuthorization,
         new Credentials(false, null));
 
     heliumAppFactory.setNotebook(notebook);

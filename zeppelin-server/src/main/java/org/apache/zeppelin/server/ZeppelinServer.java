@@ -89,7 +89,6 @@ public class ZeppelinServer extends Application {
   private InterpreterFactory replFactory;
   private SearchService noteSearchService;
   private NotebookRepoSync notebookRepo;
-  private NotebookAuthorization notebookAuthorization;
   private Credentials credentials;
   private DependencyResolver depResolver;
 
@@ -139,11 +138,10 @@ public class ZeppelinServer extends Application {
         notebookWsServer, heliumApplicationFactory, depResolver, SecurityUtils.isAuthenticated());
     this.notebookRepo = new NotebookRepoSync(conf);
     this.noteSearchService = new LuceneSearch();
-    this.notebookAuthorization = NotebookAuthorization.init(conf);
     this.credentials = new Credentials(conf.credentialsPersist(), conf.getCredentialsPath());
     notebook = new Notebook(conf,
         notebookRepo, schedulerFactory, replFactory, notebookWsServer,
-            noteSearchService, notebookAuthorization, credentials);
+            noteSearchService, credentials);
 
     // to update notebook from application event from remote process.
     heliumApplicationFactory.setNotebook(notebook);

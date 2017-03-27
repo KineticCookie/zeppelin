@@ -217,18 +217,12 @@ public class NotebookRepoSync implements NotebookRepo {
    */
   void sync(int sourceRepoIndex, int destRepoIndex, AuthenticationInfo subject) throws IOException {
     LOG.info("Sync started");
-    NotebookAuthorization auth = NotebookAuthorization.getInstance();
+
     NotebookRepo srcRepo = getRepo(sourceRepoIndex);
     NotebookRepo dstRepo = getRepo(destRepoIndex);
     List <NoteInfo> allSrcNotes = srcRepo.list(subject);
-    List <NoteInfo> srcNotes = auth.filterByUser(allSrcNotes, subject);
     List <NoteInfo> dstNotes = dstRepo.list(subject);
-
-    Map<String, List<String>> noteIds = notesCheckDiff(srcNotes, srcRepo, dstNotes, dstRepo,
-        subject);
-    List<String> pushNoteIds = noteIds.get(pushKey);
-    List<String> pullNoteIds = noteIds.get(pullKey);
-    List<String> delDstNoteIds = noteIds.get(delDstKey);
+    
 
     if (!pushNoteIds.isEmpty()) {
       LOG.info("Notes with the following IDs will be pushed");
@@ -282,10 +276,8 @@ public class NotebookRepoSync implements NotebookRepo {
   }
 
   private boolean emptyNoteAcl(String noteId) {
-    NotebookAuthorization notebookAuthorization = NotebookAuthorization.getInstance();
-    return notebookAuthorization.getOwners(noteId).isEmpty()
-        && notebookAuthorization.getReaders(noteId).isEmpty()
-        && notebookAuthorization.getWriters(noteId).isEmpty();
+
+    return false;
   }
 
   private void makePrivate(String noteId, AuthenticationInfo subject) {
@@ -293,16 +285,6 @@ public class NotebookRepoSync implements NotebookRepo {
       LOG.info("User is anonymous, permissions are not set for pulled notes");
       return;
     }
-    NotebookAuthorization notebookAuthorization = NotebookAuthorization.getInstance();
-    Set<String> users = notebookAuthorization.getOwners(noteId);
-    users.add(subject.getUser());
-    notebookAuthorization.setOwners(noteId, users);
-    users = notebookAuthorization.getReaders(noteId);
-    users.add(subject.getUser());
-    notebookAuthorization.setReaders(noteId, users);
-    users = notebookAuthorization.getWriters(noteId);
-    users.add(subject.getUser());
-    notebookAuthorization.setWriters(noteId, users);
   }
 
   private void deleteNotes(AuthenticationInfo subject, List<String> ids, NotebookRepo repo)

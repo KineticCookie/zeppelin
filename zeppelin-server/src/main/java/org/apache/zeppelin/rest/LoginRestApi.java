@@ -92,7 +92,7 @@ public class LoginRestApi {
         //if no exception, that's it, we're done!
         
         //set roles for user in NotebookAuthorization module
-        NotebookAuthorization.getInstance().setRoles(principal, roles);
+        //NotebookAuthorization.getInstance().setRoles(principal, roles);
       } catch (UnknownAccountException uae) {
         //username wasn't in the system, show them an error message?
         LOG.error("Exception in login: ", uae);

@@ -107,9 +107,8 @@ public class InterpreterFactoryTest {
 
     SearchService search = mock(SearchService.class);
     notebookRepo = new VFSNotebookRepo(conf);
-    notebookAuthorization = NotebookAuthorization.init(conf);
     notebook = new Notebook(conf, notebookRepo, schedulerFactory, factory, jobListenerFactory, search,
-        notebookAuthorization, null);
+         null);
   }
 
   @After

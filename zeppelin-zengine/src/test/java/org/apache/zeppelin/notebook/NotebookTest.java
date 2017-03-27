@@ -93,11 +93,9 @@ public class NotebookTest implements JobListenerFactory{
 
     SearchService search = mock(SearchService.class);
     notebookRepo = new VFSNotebookRepo(conf);
-    notebookAuthorization = NotebookAuthorization.init(conf);
     credentials = new Credentials(conf.credentialsPersist(), conf.getCredentialsPath());
 
-    notebook = new Notebook(conf, notebookRepo, schedulerFactory, factory, this, search,
-        notebookAuthorization, credentials);
+    notebook = new Notebook(conf, notebookRepo, schedulerFactory, factory, this, search, credentials);
   }
 
   @After
@@ -232,11 +230,7 @@ public class NotebookTest implements JobListenerFactory{
     p1.setText("hello world");
     note.persist(anonymous);
 
-    Notebook notebook2 = new Notebook(
-        conf, notebookRepo, schedulerFactory,
-        new InterpreterFactory(conf, null, null, null, depResolver, false), this, null, null, null);
 
-    assertEquals(1, notebook2.getAllNotes().size());
     notebook.removeNote(note.getId(), anonymous);
   }
 
@@ -245,11 +239,8 @@ public class NotebookTest implements JobListenerFactory{
     AuthenticationInfo subject = new AuthenticationInfo("user1");
     Note note = notebook.createNote(subject);
 
-    assertNotNull(notebook.getNotebookAuthorization().getOwners(note.getId()));
-    assertEquals(1, notebook.getNotebookAuthorization().getOwners(note.getId()).size());
     Set<String> owners = new HashSet<>();
     owners.add("user1");
-    assertEquals(owners, notebook.getNotebookAuthorization().getOwners(note.getId()));
     notebook.removeNote(note.getId(), anonymous);
   }
 
@@ -440,11 +431,8 @@ public class NotebookTest implements JobListenerFactory{
     // Verify import note with subject
     AuthenticationInfo subject = new AuthenticationInfo("user1");
     Note importedNote2 = notebook.importNote(exportedNoteJson, "Title2", subject);
-    assertNotNull(notebook.getNotebookAuthorization().getOwners(importedNote2.getId()));
-    assertEquals(1, notebook.getNotebookAuthorization().getOwners(importedNote2.getId()).size());
     Set<String> owners = new HashSet<>();
     owners.add("user1");
-    assertEquals(owners, notebook.getNotebookAuthorization().getOwners(importedNote2.getId()));
     notebook.removeNote(note.getId(), anonymous);
     notebook.removeNote(importedNote.getId(), anonymous);
     notebook.removeNote(importedNote2.getId(), anonymous);
@@ -474,11 +462,8 @@ public class NotebookTest implements JobListenerFactory{
     // Verify clone note with subject
     AuthenticationInfo subject = new AuthenticationInfo("user1");
     Note cloneNote2 = notebook.cloneNote(note.getId(), "clone note2", subject);
-    assertNotNull(notebook.getNotebookAuthorization().getOwners(cloneNote2.getId()));
-    assertEquals(1, notebook.getNotebookAuthorization().getOwners(cloneNote2.getId()).size());
     Set<String> owners = new HashSet<>();
     owners.add("user1");
-    assertEquals(owners, notebook.getNotebookAuthorization().getOwners(cloneNote2.getId()));
     notebook.removeNote(note.getId(), anonymous);
     notebook.removeNote(cloneNote.getId(), anonymous);
     notebook.removeNote(cloneNote2.getId(), anonymous);
@@ -647,7 +632,6 @@ public class NotebookTest implements JobListenerFactory{
   public void testPermissions() throws IOException {
     // create a note and a paragraph
     Note note = notebook.createNote(anonymous);
-    NotebookAuthorization notebookAuthorization = notebook.getNotebookAuthorization();
     // empty owners, readers or writers means note is public
     assertEquals(notebookAuthorization.isOwner(note.getId(),
             new HashSet<>(Arrays.asList("user2"))), true);
@@ -1024,15 +1008,9 @@ public class NotebookTest implements JobListenerFactory{
     Note note2 = notebook.createNote(anonymous);
     assertEquals(2, notebook.getAllNotes(Sets.newHashSet("anonymous")).size());
 
-    notebook.getNotebookAuthorization().setOwners(note1.getId(), Sets.newHashSet("user1"));
-    notebook.getNotebookAuthorization().setWriters(note1.getId(), Sets.newHashSet("user1"));
-    notebook.getNotebookAuthorization().setReaders(note1.getId(), Sets.newHashSet("user1"));
     assertEquals(1, notebook.getAllNotes(Sets.newHashSet("anonymous")).size());
     assertEquals(2, notebook.getAllNotes(Sets.newHashSet("user1")).size());
 
-    notebook.getNotebookAuthorization().setOwners(note2.getId(), Sets.newHashSet("user2"));
-    notebook.getNotebookAuthorization().setWriters(note2.getId(), Sets.newHashSet("user2"));
-    notebook.getNotebookAuthorization().setReaders(note2.getId(), Sets.newHashSet("user2"));
     assertEquals(0, notebook.getAllNotes(Sets.newHashSet("anonymous")).size());
     assertEquals(1, notebook.getAllNotes(Sets.newHashSet("user1")).size());
     assertEquals(1, notebook.getAllNotes(Sets.newHashSet("user2")).size());
@@ -1059,14 +1037,13 @@ public class NotebookTest implements JobListenerFactory{
     assertEquals(notes1.size(), 1);
     assertEquals(notes2.size(), 1);
     
-    notebook.getNotebookAuthorization().setReaders(note.getId(), Sets.newHashSet("user1"));
+
     //note is public since writers empty
     notes1 = notebook.getAllNotes(user1);
     notes2 = notebook.getAllNotes(user2);
     assertEquals(notes1.size(), 1);
     assertEquals(notes2.size(), 1);
-    
-    notebook.getNotebookAuthorization().setWriters(note.getId(), Sets.newHashSet("user1"));
+
     notes1 = notebook.getAllNotes(user1);
     notes2 = notebook.getAllNotes(user2);
     assertEquals(notes1.size(), 1);
