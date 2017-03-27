@@ -32,7 +32,6 @@ import org.apache.zeppelin.conf.ZeppelinConfiguration;
 import org.apache.zeppelin.conf.ZeppelinConfiguration.ConfVars;
 import org.apache.zeppelin.notebook.Note;
 import org.apache.zeppelin.notebook.NoteInfo;
-import org.apache.zeppelin.notebook.NotebookAuthorization;
 import org.apache.zeppelin.notebook.Paragraph;
 import org.apache.zeppelin.user.AuthenticationInfo;
 import org.slf4j.Logger;
@@ -222,37 +221,7 @@ public class NotebookRepoSync implements NotebookRepo {
     NotebookRepo dstRepo = getRepo(destRepoIndex);
     List <NoteInfo> allSrcNotes = srcRepo.list(subject);
     List <NoteInfo> dstNotes = dstRepo.list(subject);
-    
 
-    if (!pushNoteIds.isEmpty()) {
-      LOG.info("Notes with the following IDs will be pushed");
-      for (String id : pushNoteIds) {
-        LOG.info("ID : " + id);
-      }
-      pushNotes(subject, pushNoteIds, srcRepo, dstRepo, false);
-    } else {
-      LOG.info("Nothing to push");
-    }
-
-    if (!pullNoteIds.isEmpty()) {
-      LOG.info("Notes with the following IDs will be pulled");
-      for (String id : pullNoteIds) {
-        LOG.info("ID : " + id);
-      }
-      pushNotes(subject, pullNoteIds, dstRepo, srcRepo, true);
-    } else {
-      LOG.info("Nothing to pull");
-    }
-
-    if (!delDstNoteIds.isEmpty()) {
-      LOG.info("Notes with the following IDs will be deleted from dest");
-      for (String id : delDstNoteIds) {
-        LOG.info("ID : " + id);
-      }
-      deleteNotes(subject, delDstNoteIds, dstRepo);
-    } else {
-      LOG.info("Nothing to delete from dest");
-    }
 
     LOG.info("Sync ended");
   }

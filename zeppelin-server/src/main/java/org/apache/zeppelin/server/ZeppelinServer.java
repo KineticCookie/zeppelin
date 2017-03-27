@@ -39,7 +39,6 @@ import org.apache.zeppelin.helium.HeliumVisualizationFactory;
 import org.apache.zeppelin.interpreter.InterpreterFactory;
 import org.apache.zeppelin.interpreter.InterpreterOutput;
 import org.apache.zeppelin.notebook.Notebook;
-import org.apache.zeppelin.notebook.NotebookAuthorization;
 import org.apache.zeppelin.notebook.repo.NotebookRepoSync;
 import org.apache.zeppelin.rest.ConfigurationsRestApi;
 import org.apache.zeppelin.rest.CredentialRestApi;

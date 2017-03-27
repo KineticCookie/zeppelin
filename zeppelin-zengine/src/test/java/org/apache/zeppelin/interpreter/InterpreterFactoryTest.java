@@ -44,7 +44,7 @@ import org.apache.zeppelin.interpreter.remote.RemoteInterpreter;
 import org.apache.zeppelin.notebook.JobListenerFactory;
 import org.apache.zeppelin.notebook.Note;
 import org.apache.zeppelin.notebook.Notebook;
-import org.apache.zeppelin.notebook.NotebookAuthorization;
+
 import org.apache.zeppelin.notebook.repo.NotebookRepo;
 import org.apache.zeppelin.notebook.repo.VFSNotebookRepo;
 import org.apache.zeppelin.scheduler.SchedulerFactory;
@@ -75,7 +75,6 @@ public class InterpreterFactoryTest {
   private NotebookRepo notebookRepo;
   private DependencyResolver depResolver;
   private SchedulerFactory schedulerFactory;
-  private NotebookAuthorization notebookAuthorization;
   @Mock
   private JobListenerFactory jobListenerFactory;
 

@@ -68,7 +68,6 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
   private InterpreterFactory factory;
   private DependencyResolver depResolver;
   private SearchService search;
-  private NotebookAuthorization notebookAuthorization;
   private Credentials credentials;
   private AuthenticationInfo anonymous;
   private static final Logger LOG = LoggerFactory.getLogger(NotebookRepoSyncTest.class);
@@ -105,10 +104,9 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
     
     search = mock(SearchService.class);
     notebookRepoSync = new NotebookRepoSync(conf);
-    notebookAuthorization = NotebookAuthorization.init(conf);
     credentials = new Credentials(conf.credentialsPersist(), conf.getCredentialsPath());
     notebookSync = new Notebook(conf, notebookRepoSync, schedulerFactory, factory, this, search,
-            notebookAuthorization, credentials);
+             credentials);
     anonymous = new AuthenticationInfo("anonymous");
   }
 
@@ -237,7 +235,7 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
     conf = ZeppelinConfiguration.create();
     notebookRepoSync = new NotebookRepoSync(conf);
     notebookSync = new Notebook(conf, notebookRepoSync, schedulerFactory, factory, this, search,
-            notebookAuthorization, credentials);
+             credentials);
 
     // check that both storage repos are empty
     assertTrue(notebookRepoSync.getRepoCount() > 1);
@@ -285,7 +283,7 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
 
     NotebookRepoSync vRepoSync = new NotebookRepoSync(vConf);
     Notebook vNotebookSync = new Notebook(vConf, vRepoSync, schedulerFactory, factory, this, search,
-            notebookAuthorization, credentials);
+             credentials);
 
     // one git versioned storage initialized
     assertThat(vRepoSync.getRepoCount()).isEqualTo(1);
@@ -329,15 +327,7 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
     assertEquals(1, notebookRepoSync.list(0, null).size());
     assertEquals(1, notebookRepoSync.list(1, null).size());
     
-    /* check that user1 is the only owner */
-    NotebookAuthorization authInfo = NotebookAuthorization.getInstance();
-    Set<String> entity = new HashSet<String>();
-    entity.add(user1.getUser());
-    assertEquals(true, authInfo.isOwner(note.getId(), entity));
-    assertEquals(1, authInfo.getOwners(note.getId()).size());
-    assertEquals(0, authInfo.getReaders(note.getId()).size());
-    assertEquals(0, authInfo.getWriters(note.getId()).size());
-    
+
     /* update note and save on secondary storage */
     Paragraph p1 = note.addParagraph(AuthenticationInfo.ANONYMOUS);
     p1.setText("hello world");
@@ -357,31 +347,18 @@ public class NotebookRepoSyncTest implements JobListenerFactory {
     /* check that note updated and acl are same on main storage*/
     assertEquals(1, notebookRepoSync.get(0,
         notebookRepoSync.list(0, null).get(0).getId(), null).getParagraphs().size());
-    assertEquals(true, authInfo.isOwner(note.getId(), entity));
-    assertEquals(1, authInfo.getOwners(note.getId()).size());
-    assertEquals(0, authInfo.getReaders(note.getId()).size());
-    assertEquals(0, authInfo.getWriters(note.getId()).size());
+
     
     /* scenario 2 - note doesn't exist on main storage */
     /* remove from main storage */
     notebookRepoSync.remove(0, note.getId(), user1);
     assertEquals(0, notebookRepoSync.list(0, null).size());
     assertEquals(1, notebookRepoSync.list(1, null).size());
-    authInfo.removeNote(note.getId());
-    assertEquals(0, authInfo.getOwners(note.getId()).size());
-    assertEquals(0, authInfo.getReaders(note.getId()).size());
-    assertEquals(0, authInfo.getWriters(note.getId()).size());
     
     /* now sync - should bring note from secondary storage with added acl */
     notebookRepoSync.sync(user1);
     assertEquals(1, notebookRepoSync.list(0, null).size());
     assertEquals(1, notebookRepoSync.list(1, null).size());
-    assertEquals(1, authInfo.getOwners(note.getId()).size());
-    assertEquals(1, authInfo.getReaders(note.getId()).size());
-    assertEquals(1, authInfo.getWriters(note.getId()).size());
-    assertEquals(true, authInfo.isOwner(note.getId(), entity));
-    assertEquals(true, authInfo.isReader(note.getId(), entity));
-    assertEquals(true, authInfo.isWriter(note.getId(), entity));
   }
 
   static void delete(File file){

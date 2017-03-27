@@ -58,7 +58,6 @@ import org.apache.zeppelin.notebook.JobListenerFactory;
 import org.apache.zeppelin.notebook.Folder;
 import org.apache.zeppelin.notebook.Note;
 import org.apache.zeppelin.notebook.Notebook;
-import org.apache.zeppelin.notebook.NotebookAuthorization;
 import org.apache.zeppelin.notebook.NotebookEventListener;
 import org.apache.zeppelin.notebook.Paragraph;
 import org.apache.zeppelin.notebook.ParagraphJobListener;

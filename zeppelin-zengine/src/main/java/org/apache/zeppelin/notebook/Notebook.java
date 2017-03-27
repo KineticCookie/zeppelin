@@ -101,7 +101,8 @@ public class Notebook implements NoteEventListener {
    */
   public Notebook(ZeppelinConfiguration conf, NotebookRepo notebookRepo,
       SchedulerFactory schedulerFactory, InterpreterFactory replFactory,
-      JobListenerFactory jobListenerFactory, SearchService noteSearchService, Credentials credentials)
+      JobListenerFactory jobListenerFactory,
+                  SearchService noteSearchService, Credentials credentials)
       throws IOException, SchedulerException {
     this.conf = conf;
     this.notebookRepo = notebookRepo;
@@ -623,7 +624,7 @@ public class Notebook implements NoteEventListener {
       return FluentIterable.from(notes.values()).filter(new Predicate<Note>() {
         @Override
         public boolean apply(Note input) {
-          return input != null ;
+          return input != null;
         }
       }).toSortedList(new Comparator<Note>() {
         @Override
