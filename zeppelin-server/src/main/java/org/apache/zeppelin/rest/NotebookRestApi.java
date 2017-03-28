@@ -40,7 +40,6 @@ import org.apache.zeppelin.annotation.ZeppelinApi;
 import org.apache.zeppelin.interpreter.InterpreterResult;
 import org.apache.zeppelin.notebook.Note;
 import org.apache.zeppelin.notebook.Notebook;
-import org.apache.zeppelin.notebook.NotebookAuthorization;
 import org.apache.zeppelin.notebook.Paragraph;
 import org.apache.zeppelin.rest.exception.BadRequestException;
 import org.apache.zeppelin.rest.exception.NotFoundException;
@@ -75,7 +74,6 @@ public class NotebookRestApi {
   private Notebook notebook;
   private NotebookServer notebookServer;
   private SearchService noteSearchService;
-  private NotebookAuthorization notebookAuthorization;
 
   public NotebookRestApi() {
   }
@@ -84,7 +82,7 @@ public class NotebookRestApi {
     this.notebook = notebook;
     this.notebookServer = notebookServer;
     this.noteSearchService = search;
-    this.notebookAuthorization = notebook.getNotebookAuthorization();
+
   }
 
   /**
@@ -99,9 +97,6 @@ public class NotebookRestApi {
     checkIfUserCanRead(noteId,
         "Insufficient privileges you cannot get the list of permissions for this note");
     HashMap<String, Set<String>> permissionsMap = new HashMap<>();
-    permissionsMap.put("owners", notebookAuthorization.getOwners(noteId));
-    permissionsMap.put("readers", notebookAuthorization.getReaders(noteId));
-    permissionsMap.put("writers", notebookAuthorization.getWriters(noteId));
     return new JsonResponse<>(Status.OK, "", permissionsMap).build();
   }
 
@@ -141,9 +136,7 @@ public class NotebookRestApi {
     Set<String> userAndRoles = Sets.newHashSet();
     userAndRoles.add(SecurityUtils.getPrincipal());
     userAndRoles.addAll(SecurityUtils.getRoles());
-    if (!notebookAuthorization.isOwner(userAndRoles, noteId)) {
-      throw new ForbiddenException(errorMsg);
-    }
+
   }
 
   /**
@@ -153,9 +146,7 @@ public class NotebookRestApi {
     Set<String> userAndRoles = Sets.newHashSet();
     userAndRoles.add(SecurityUtils.getPrincipal());
     userAndRoles.addAll(SecurityUtils.getRoles());
-    if (!notebookAuthorization.hasWriteAuthorization(userAndRoles, noteId)) {
-      throw new ForbiddenException(errorMsg);
-    }
+
   }
 
   /**
@@ -165,9 +156,7 @@ public class NotebookRestApi {
     Set<String> userAndRoles = Sets.newHashSet();
     userAndRoles.add(SecurityUtils.getPrincipal());
     userAndRoles.addAll(SecurityUtils.getRoles());
-    if (!notebookAuthorization.hasReadAuthorization(userAndRoles, noteId)) {
-      throw new ForbiddenException(errorMsg);
-    }
+
   }
 
   private void checkIfNoteIsNotNull(Note note) {
@@ -197,8 +186,7 @@ public class NotebookRestApi {
     userAndRoles.addAll(roles);
 
     checkIfUserIsAnon(getBlockNotAuthenticatedUserErrorMsg());
-    checkIfUserIsOwner(noteId,
-        ownerPermissionError(userAndRoles, notebookAuthorization.getOwners(noteId)));
+
     
     HashMap<String, HashSet<String>> permMap =
         gson.fromJson(req, new TypeToken<HashMap<String, HashSet<String>>>() {}.getType());
@@ -226,11 +214,6 @@ public class NotebookRestApi {
       }
     }
 
-    notebookAuthorization.setReaders(noteId, readers);
-    notebookAuthorization.setWriters(noteId, writers);
-    notebookAuthorization.setOwners(noteId, owners);
-    LOG.debug("After set permissions {} {} {}", notebookAuthorization.getOwners(noteId),
-        notebookAuthorization.getReaders(noteId), notebookAuthorization.getWriters(noteId));
     AuthenticationInfo subject = new AuthenticationInfo(SecurityUtils.getPrincipal());
     note.persist(subject);
     notebookServer.broadcastNote(note);
@@ -936,12 +919,6 @@ public class NotebookRestApi {
     for (int i = 0; i < notesFound.size(); i++) {
       String[] Id = notesFound.get(i).get("id").split("/", 2);
       String noteId = Id[0];
-      if (!notebookAuthorization.isOwner(noteId, userAndRoles) &&
-          !notebookAuthorization.isReader(noteId, userAndRoles) &&
-          !notebookAuthorization.isWriter(noteId, userAndRoles)) {
-        notesFound.remove(i);
-        i--;
-      }
     }
     LOG.info("{} notes found", notesFound.size());
     return new JsonResponse<>(Status.OK, notesFound).build();

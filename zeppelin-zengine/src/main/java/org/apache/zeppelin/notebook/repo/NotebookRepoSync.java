@@ -32,7 +32,6 @@ import org.apache.zeppelin.conf.ZeppelinConfiguration;
 import org.apache.zeppelin.conf.ZeppelinConfiguration.ConfVars;
 import org.apache.zeppelin.notebook.Note;
 import org.apache.zeppelin.notebook.NoteInfo;
-import org.apache.zeppelin.notebook.NotebookAuthorization;
 import org.apache.zeppelin.notebook.Paragraph;
 import org.apache.zeppelin.user.AuthenticationInfo;
 import org.slf4j.Logger;
@@ -217,48 +216,12 @@ public class NotebookRepoSync implements NotebookRepo {
    */
   void sync(int sourceRepoIndex, int destRepoIndex, AuthenticationInfo subject) throws IOException {
     LOG.info("Sync started");
-    NotebookAuthorization auth = NotebookAuthorization.getInstance();
+
     NotebookRepo srcRepo = getRepo(sourceRepoIndex);
     NotebookRepo dstRepo = getRepo(destRepoIndex);
     List <NoteInfo> allSrcNotes = srcRepo.list(subject);
-    List <NoteInfo> srcNotes = auth.filterByUser(allSrcNotes, subject);
     List <NoteInfo> dstNotes = dstRepo.list(subject);
 
-    Map<String, List<String>> noteIds = notesCheckDiff(srcNotes, srcRepo, dstNotes, dstRepo,
-        subject);
-    List<String> pushNoteIds = noteIds.get(pushKey);
-    List<String> pullNoteIds = noteIds.get(pullKey);
-    List<String> delDstNoteIds = noteIds.get(delDstKey);
-
-    if (!pushNoteIds.isEmpty()) {
-      LOG.info("Notes with the following IDs will be pushed");
-      for (String id : pushNoteIds) {
-        LOG.info("ID : " + id);
-      }
-      pushNotes(subject, pushNoteIds, srcRepo, dstRepo, false);
-    } else {
-      LOG.info("Nothing to push");
-    }
-
-    if (!pullNoteIds.isEmpty()) {
-      LOG.info("Notes with the following IDs will be pulled");
-      for (String id : pullNoteIds) {
-        LOG.info("ID : " + id);
-      }
-      pushNotes(subject, pullNoteIds, dstRepo, srcRepo, true);
-    } else {
-      LOG.info("Nothing to pull");
-    }
-
-    if (!delDstNoteIds.isEmpty()) {
-      LOG.info("Notes with the following IDs will be deleted from dest");
-      for (String id : delDstNoteIds) {
-        LOG.info("ID : " + id);
-      }
-      deleteNotes(subject, delDstNoteIds, dstRepo);
-    } else {
-      LOG.info("Nothing to delete from dest");
-    }
 
     LOG.info("Sync ended");
   }
@@ -282,10 +245,8 @@ public class NotebookRepoSync implements NotebookRepo {
   }
 
   private boolean emptyNoteAcl(String noteId) {
-    NotebookAuthorization notebookAuthorization = NotebookAuthorization.getInstance();
-    return notebookAuthorization.getOwners(noteId).isEmpty()
-        && notebookAuthorization.getReaders(noteId).isEmpty()
-        && notebookAuthorization.getWriters(noteId).isEmpty();
+
+    return false;
   }
 
   private void makePrivate(String noteId, AuthenticationInfo subject) {
@@ -293,16 +254,6 @@ public class NotebookRepoSync implements NotebookRepo {
       LOG.info("User is anonymous, permissions are not set for pulled notes");
       return;
     }
-    NotebookAuthorization notebookAuthorization = NotebookAuthorization.getInstance();
-    Set<String> users = notebookAuthorization.getOwners(noteId);
-    users.add(subject.getUser());
-    notebookAuthorization.setOwners(noteId, users);
-    users = notebookAuthorization.getReaders(noteId);
-    users.add(subject.getUser());
-    notebookAuthorization.setReaders(noteId, users);
-    users = notebookAuthorization.getWriters(noteId);
-    users.add(subject.getUser());
-    notebookAuthorization.setWriters(noteId, users);
   }
 
   private void deleteNotes(AuthenticationInfo subject, List<String> ids, NotebookRepo repo)

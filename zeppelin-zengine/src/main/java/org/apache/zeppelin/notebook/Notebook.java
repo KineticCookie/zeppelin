@@ -88,7 +88,6 @@ public class Notebook implements NoteEventListener {
   private JobListenerFactory jobListenerFactory;
   private NotebookRepo notebookRepo;
   private SearchService noteSearchService;
-  private NotebookAuthorization notebookAuthorization;
   private final List<NotebookEventListener> notebookEventListeners =
       Collections.synchronizedList(new LinkedList<NotebookEventListener>());
   private Credentials credentials;
@@ -102,8 +101,8 @@ public class Notebook implements NoteEventListener {
    */
   public Notebook(ZeppelinConfiguration conf, NotebookRepo notebookRepo,
       SchedulerFactory schedulerFactory, InterpreterFactory replFactory,
-      JobListenerFactory jobListenerFactory, SearchService noteSearchService,
-      NotebookAuthorization notebookAuthorization, Credentials credentials)
+      JobListenerFactory jobListenerFactory,
+                  SearchService noteSearchService, Credentials credentials)
       throws IOException, SchedulerException {
     this.conf = conf;
     this.notebookRepo = notebookRepo;
@@ -111,7 +110,6 @@ public class Notebook implements NoteEventListener {
     this.replFactory = replFactory;
     this.jobListenerFactory = jobListenerFactory;
     this.noteSearchService = noteSearchService;
-    this.notebookAuthorization = notebookAuthorization;
     this.credentials = credentials;
     quertzSchedFact = new org.quartz.impl.StdSchedulerFactory();
     quartzSched = quertzSchedFact.getScheduler();
@@ -165,7 +163,6 @@ public class Notebook implements NoteEventListener {
       bindInterpretersToNote(subject.getUser(), note.getId(), interpreterIds);
     }
 
-    notebookAuthorization.setNewNotePermissions(note.getId(), subject);
     noteSearchService.addIndexDoc(note);
     note.persist(subject);
     fireNoteCreateEvent(note);
@@ -221,7 +218,6 @@ public class Notebook implements NoteEventListener {
         newNote.addCloneParagraph(p);
       }
 
-      notebookAuthorization.setNewNotePermissions(newNote.getId(), subject);
       newNote.persist(subject);
     } catch (IOException e) {
       logger.error(e.toString(), e);
@@ -330,7 +326,6 @@ public class Notebook implements NoteEventListener {
     }
     replFactory.removeNoteInterpreterSettingBinding(subject.getUser(), id);
     noteSearchService.deleteIndexDocs(note);
-    notebookAuthorization.removeNote(id);
 
     // remove from all interpreter instance's angular object registry
     for (InterpreterSetting settings : replFactory.get()) {
@@ -629,7 +624,7 @@ public class Notebook implements NoteEventListener {
       return FluentIterable.from(notes.values()).filter(new Predicate<Note>() {
         @Override
         public boolean apply(Note input) {
-          return input != null && notebookAuthorization.isReader(input.getId(), entities);
+          return input != null;
         }
       }).toSortedList(new Comparator<Note>() {
         @Override
@@ -946,10 +941,6 @@ public class Notebook implements NoteEventListener {
 
   public InterpreterFactory getInterpreterFactory() {
     return replFactory;
-  }
-
-  public NotebookAuthorization getNotebookAuthorization() {
-    return notebookAuthorization;
   }
 
   public ZeppelinConfiguration getConf() {

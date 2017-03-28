@@ -39,7 +39,6 @@ import org.apache.zeppelin.helium.HeliumVisualizationFactory;
 import org.apache.zeppelin.interpreter.InterpreterFactory;
 import org.apache.zeppelin.interpreter.InterpreterOutput;
 import org.apache.zeppelin.notebook.Notebook;
-import org.apache.zeppelin.notebook.NotebookAuthorization;
 import org.apache.zeppelin.notebook.repo.NotebookRepoSync;
 import org.apache.zeppelin.rest.ConfigurationsRestApi;
 import org.apache.zeppelin.rest.CredentialRestApi;
@@ -89,7 +88,6 @@ public class ZeppelinServer extends Application {
   private InterpreterFactory replFactory;
   private SearchService noteSearchService;
   private NotebookRepoSync notebookRepo;
-  private NotebookAuthorization notebookAuthorization;
   private Credentials credentials;
   private DependencyResolver depResolver;
 
@@ -139,11 +137,10 @@ public class ZeppelinServer extends Application {
         notebookWsServer, heliumApplicationFactory, depResolver, SecurityUtils.isAuthenticated());
     this.notebookRepo = new NotebookRepoSync(conf);
     this.noteSearchService = new LuceneSearch();
-    this.notebookAuthorization = NotebookAuthorization.init(conf);
     this.credentials = new Credentials(conf.credentialsPersist(), conf.getCredentialsPath());
     notebook = new Notebook(conf,
         notebookRepo, schedulerFactory, replFactory, notebookWsServer,
-            noteSearchService, notebookAuthorization, credentials);
+            noteSearchService, credentials);
 
     // to update notebook from application event from remote process.
     heliumApplicationFactory.setNotebook(notebook);
@@ -379,8 +376,6 @@ public class ZeppelinServer extends Application {
     SecurityRestApi securityApi = new SecurityRestApi();
     singletons.add(securityApi);
 
-    LoginRestApi loginRestApi = new LoginRestApi();
-    singletons.add(loginRestApi);
 
     ConfigurationsRestApi settingsApi = new ConfigurationsRestApi(notebook);
     singletons.add(settingsApi);
