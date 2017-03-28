@@ -145,7 +145,7 @@ public class NotebookRestApi {
       throw new ForbiddenException(errorMsg);
     }
   }
-  
+
   /**
    * Check if the current user is either Owner or Writer for the given note.
    */
@@ -157,7 +157,7 @@ public class NotebookRestApi {
       throw new ForbiddenException(errorMsg);
     }
   }
-  
+
   /**
    * Check if the current user can access (at least he have to be reader) the given note.
    */
@@ -169,7 +169,7 @@ public class NotebookRestApi {
       throw new ForbiddenException(errorMsg);
     }
   }
-  
+
   private void checkIfNoteIsNotNull(Note note) {
     if (note == null) {
       throw new NotFoundException("note not found");

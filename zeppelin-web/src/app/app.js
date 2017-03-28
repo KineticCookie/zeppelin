@@ -89,14 +89,10 @@ var zeppelinWebApp = angular.module('zeppelinWebApp', [
         controller: 'NotebookReposCtrl',
         controllerAs: 'noterepo'
       })
-      .when('/credential', {
-        templateUrl: 'app/credential/credential.html',
-        controller: 'CredentialCtrl'
-      })
       .when('/helium', {
         templateUrl: 'app/helium/helium.html',
         controller: 'HeliumCtrl'
-      })    
+      })
       .when('/configuration', {
         templateUrl: 'app/configuration/configuration.html',
         controller: 'ConfigurationCtrl'
