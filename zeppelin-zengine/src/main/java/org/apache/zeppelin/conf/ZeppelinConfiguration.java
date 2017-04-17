@@ -38,14 +38,14 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class ZeppelinConfiguration extends XMLConfiguration {
+    private ConfigStrategy strategy;
   private static final String ZEPPELIN_SITE_XML = "zeppelin-site.xml";
   private static final long serialVersionUID = 4749305895693848035L;
   private static final Logger LOG = LoggerFactory.getLogger(ZeppelinConfiguration.class);
   private static ZeppelinConfiguration conf;
 
   public ZeppelinConfiguration(URL url) throws ConfigurationException {
-    setDelimiterParsingDisabled(true);
-    load(url);
+      ConfigStrategyFactory.init(url);
   }
 
   public ZeppelinConfiguration() {
@@ -107,7 +107,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
     }
     
     LOG.info("Server Host: " + conf.getServerAddress());
-    if (conf.useSsl() == false) {
+    if (!conf.useSsl()) {
       LOG.info("Server Port: " + conf.getServerPort());
     } else {
       LOG.info("Server SSL Port: " + conf.getServerSslPort());
