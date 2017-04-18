@@ -43,14 +43,12 @@ public class ZeppelinConfiguration extends XMLConfiguration {
   private static final Logger LOG = LoggerFactory.getLogger(ZeppelinConfiguration.class);
   private static ZeppelinConfiguration conf;
 
-  public ZeppelinConfiguration(URL url) throws ConfigurationException {
+  public ZeppelinConfiguration(URL url) {
     strategy = ConfigStrategyFactory.init(url);
   }
 
   public ZeppelinConfiguration() {
-    DefaultStrategy defStrategy = ConfigStrategyFactory.defaultStrategy();
-    assert defStrategy != null;
-    defStrategy.setDefaults(ConfVars.values());
+    this(null);
   }
 
 
@@ -95,13 +93,8 @@ public class ZeppelinConfiguration extends XMLConfiguration {
       LOG.warn("Failed to load configuration, proceeding with a default");
       conf = new ZeppelinConfiguration();
     } else {
-      try {
-        LOG.info("Load configuration from " + url);
-        conf = new ZeppelinConfiguration(url);
-      } catch (ConfigurationException e) {
-        LOG.warn("Failed to load configuration from " + url + " proceeding with a default", e);
-        conf = new ZeppelinConfiguration();
-      }
+      LOG.info("Load configuration from " + url);
+      conf = new ZeppelinConfiguration(url);
     }
 
     LOG.info("Server Host: " + conf.getServerAddress());

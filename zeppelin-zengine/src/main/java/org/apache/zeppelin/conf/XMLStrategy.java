@@ -103,9 +103,13 @@ public class XMLStrategy extends XMLConfiguration implements ConfigStrategy {
     return d;
   }
 
-  public XMLStrategy(URL url) throws ConfigurationException {
+  public XMLStrategy(URL url) {
     setDelimiterParsingDisabled(true);
-    load(url);
+    try {
+      load(url);
+    } catch (ConfigurationException e) {
+      e.printStackTrace();
+    }
   }
 
 }
