@@ -17,7 +17,12 @@
 
 package org.apache.zeppelin.conf;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import org.json.*;
 /**
  * Created by Bulat on 17.04.2017.
@@ -26,7 +31,14 @@ public class JSONStrategy implements ConfigStrategy {
   JSONObject obj;
 
   public JSONStrategy(URL url) {
-    obj = new JSONObject(url);
+    try {
+      String contents = new String(Files.readAllBytes(Paths.get(url.toURI())));
+      obj = new JSONObject(contents);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
