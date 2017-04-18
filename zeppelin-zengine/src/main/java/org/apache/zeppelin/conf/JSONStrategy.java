@@ -11,11 +11,6 @@ public class JSONStrategy implements ConfigStrategy {
   }
 
   @Override
-  public double getDouble(String name, double alternative) {
-    return 0;
-  }
-
-  @Override
   public int getInt(String name, int alternative) {
     return 0;
   }
