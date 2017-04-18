@@ -97,4 +97,11 @@ public class ZeppelinConfigurationTest {
       boolean isIt = conf.isNotebokPublic();
       assertTrue(isIt);
     }
+
+    @Test
+    public void jsonConfigurationTest() throws ConfigurationException {
+        ZeppelinConfiguration conf  = new ZeppelinConfiguration(this.getClass().getResource("/zeppelin-site.json"));
+        boolean isIt = conf.isNotebokPublic();
+        assertTrue(isIt);
+    }
 }
