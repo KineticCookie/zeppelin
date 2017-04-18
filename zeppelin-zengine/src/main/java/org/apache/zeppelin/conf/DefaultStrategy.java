@@ -8,53 +8,49 @@ import java.net.URL;
 /**
  * Created by Bulat on 18.04.2017.
  */
-public class DefaultStrategy extends XMLStrategy implements ConfigStrategy {
-  public DefaultStrategy() throws ConfigurationException, MalformedURLException {
-    super(new URL(""));
-  }
-
-  @Override
-  public double getDouble(String name, double alternative) {
-    return 0;
+public class DefaultStrategy implements ConfigStrategy {
+  private XMLStrategy strategy;
+  public DefaultStrategy() throws MalformedURLException, ConfigurationException {
+    strategy = new XMLStrategy(new URL(""));
   }
 
   @Override
   public int getInt(String name, int alternative) {
-    return 0;
+    return strategy.getInt(name, alternative);
   }
 
   @Override
   public long getLong(String name, long alternative) {
-    return 0;
+    return strategy.getLong(name, alternative);
   }
 
   @Override
   public float getFloat(String name, float alternative) {
-    return 0;
+    return strategy.getFloat(name, alternative);
   }
 
   @Override
   public boolean getBoolean(String name, boolean alternative) {
-    return false;
+    return strategy.getBoolean(name, alternative);
   }
 
   @Override
   public String getString(String name, String alternative) {
-    return null;
+    return strategy.getString(name, alternative);
   }
 
   void setDefaults(ZeppelinConfiguration.ConfVars[] values) {
     for (ZeppelinConfiguration.ConfVars v : values) {
       if (v.getType() == ZeppelinConfiguration.ConfVars.VarType.BOOLEAN) {
-        this.setProperty(v.getVarName(), v.getBooleanValue());
+        strategy.setProperty(v.getVarName(), v.getBooleanValue());
       } else if (v.getType() == ZeppelinConfiguration.ConfVars.VarType.LONG) {
-        this.setProperty(v.getVarName(), v.getLongValue());
+        strategy.setProperty(v.getVarName(), v.getLongValue());
       } else if (v.getType() == ZeppelinConfiguration.ConfVars.VarType.INT) {
-        this.setProperty(v.getVarName(), v.getIntValue());
+        strategy.setProperty(v.getVarName(), v.getIntValue());
       } else if (v.getType() == ZeppelinConfiguration.ConfVars.VarType.FLOAT) {
-        this.setProperty(v.getVarName(), v.getFloatValue());
+        strategy.setProperty(v.getVarName(), v.getFloatValue());
       } else if (v.getType() == ZeppelinConfiguration.ConfVars.VarType.STRING) {
-        this.setProperty(v.getVarName(), v.getStringValue());
+        strategy.setProperty(v.getVarName(), v.getStringValue());
       } else {
         throw new RuntimeException("Unsupported VarType");
       }
