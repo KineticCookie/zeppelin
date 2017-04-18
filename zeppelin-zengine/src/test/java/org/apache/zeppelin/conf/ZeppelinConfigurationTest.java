@@ -110,4 +110,14 @@ public class ZeppelinConfigurationTest {
     List<String> origins = conf.getAllowedOrigins();
     Assert.assertEquals(1, origins.size());
   }
+
+  @Test
+  public void defaultConfigurationTest() throws ConfigurationException {
+    ZeppelinConfiguration conf = new ZeppelinConfiguration();
+    boolean isIt = conf.isNotebokPublic();
+    assertTrue(isIt);
+
+    String notebookLocation = conf.getServerAddress();
+    Assert.assertEquals("0.0.0.0", notebookLocation);
+  }
 }

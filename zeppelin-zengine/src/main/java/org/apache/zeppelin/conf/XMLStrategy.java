@@ -103,6 +103,10 @@ public class XMLStrategy extends XMLConfiguration implements ConfigStrategy {
     return d;
   }
 
+  public XMLStrategy(){
+
+  }
+
   public XMLStrategy(URL url) {
     setDelimiterParsingDisabled(true);
     try {
