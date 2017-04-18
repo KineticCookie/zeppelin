@@ -18,37 +18,94 @@
 package org.apache.zeppelin.conf;
 
 import java.net.URL;
-
+import org.json.*;
 /**
  * Created by Bulat on 17.04.2017.
  */
 public class JSONStrategy implements ConfigStrategy {
-  public JSONStrategy(URL url) {
+  JSONObject obj;
 
+  public JSONStrategy(URL url) {
+    obj = new JSONObject(url);
   }
 
   @Override
   public int getInt(String name, int alternative) {
-    return 0;
+    JSONArray properties = obj.getJSONObject("configuration").getJSONArray("property");
+    if (properties == null) {
+      return alternative;
+    }
+    String propertyName;
+    for (int i = 0; i < properties.length(); i++) {
+      propertyName = properties.getJSONObject(i).getString("name");
+      if (propertyName != null && name.equals(propertyName)) {
+        return Integer.parseInt((String) properties.getJSONObject(i).getString("value"));
+      }
+    }
+    return alternative;
   }
 
   @Override
   public long getLong(String name, long alternative) {
-    return 0;
+    JSONArray properties = obj.getJSONObject("configuration").getJSONArray("property");
+    if (properties == null) {
+      return alternative;
+    }
+    String propertyName;
+    for (int i = 0; i < properties.length(); i++) {
+      propertyName = properties.getJSONObject(i).getString("name");
+      if (propertyName != null && name.equals(propertyName)) {
+        return Long.parseLong((String) properties.getJSONObject(i).getString("value"));
+      }
+    }
+    return alternative;
   }
 
   @Override
   public float getFloat(String name, float alternative) {
-    return 0;
+    JSONArray properties = obj.getJSONObject("configuration").getJSONArray("property");
+    if (properties == null) {
+      return alternative;
+    }
+    String propertyName;
+    for (int i = 0; i < properties.length(); i++) {
+      propertyName = properties.getJSONObject(i).getString("name");
+      if (propertyName != null && name.equals(propertyName)) {
+        return Float.parseFloat((String) properties.getJSONObject(i).getString("value"));
+      }
+    }
+    return alternative;
   }
 
   @Override
   public boolean getBoolean(String name, boolean alternative) {
-    return false;
+    JSONArray properties = obj.getJSONObject("configuration").getJSONArray("property");
+    if (properties == null) {
+      return alternative;
+    }
+    String propertyName;
+    for (int i = 0; i < properties.length(); i++) {
+      propertyName = properties.getJSONObject(i).getString("name");
+      if (propertyName != null && name.equals(propertyName)) {
+        return Boolean.parseBoolean((String) properties.getJSONObject(i).getString("value"));
+      }
+    }
+    return alternative;
   }
 
   @Override
   public String getString(String name, String alternative) {
-    return null;
+    JSONArray properties = obj.getJSONObject("configuration").getJSONArray("property");
+    if (properties == null) {
+      return alternative;
+    }
+    String propertyName;
+    for (int i = 0; i < properties.length(); i++) {
+      propertyName = properties.getJSONObject(i).getString("name");
+      if (propertyName != null && name.equals(propertyName)) {
+        return properties.getJSONObject(i).getString("value");
+      }
+    }
+    return alternative;
   }
 }
