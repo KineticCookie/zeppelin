@@ -47,7 +47,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
     strategy = ConfigStrategyFactory.init(url);
   }
 
-  public ZeppelinConfiguration() throws ConfigurationException {
+  public ZeppelinConfiguration() {
     DefaultStrategy defStrategy = ConfigStrategyFactory.defaultStrategy();
     assert defStrategy != null;
     defStrategy.setDefaults(ConfVars.values());
@@ -60,7 +60,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
    *
    * @throws ConfigurationException
    */
-  public static synchronized ZeppelinConfiguration create() throws ConfigurationException {
+  public static synchronized ZeppelinConfiguration create() {
     if (conf != null) {
       return conf;
     }
